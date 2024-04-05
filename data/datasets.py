@@ -34,7 +34,7 @@ class CharacterDataset(torch.utils.data.Dataset):
             idx (int): The index of the item to retrieve.
 
         Returns:
-            tuple: A tuple containing the image, class label, and bounding box label.
+            tuple: A tuple containing the image and the labels (class label and bbox label).
         Raises:
             FileNotFoundError: If no image file or label file is found for the given index.
         """
@@ -64,5 +64,7 @@ class CharacterDataset(torch.utils.data.Dataset):
         if self.target_transform:
             class_label = self.target_transform(class_label)
             bbox_label = self.target_transform(bbox_label)
-
-        return image, class_label, bbox_label
+            
+        labels = (class_label, bbox_label)
+        
+        return image, labels

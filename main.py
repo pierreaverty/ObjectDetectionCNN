@@ -9,7 +9,6 @@ from torch import nn
 
 from models.cnn import ObjectDetectionCNN
 
-
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import numpy as np
@@ -48,4 +47,3 @@ print("Validation data loaded, size: ", len(validation_data))
 if __name__ == "__main__":
     train_dataloader = DataLoader(training_data, batch_size=BATCH_SIZE)
     validatation_dataloader = DataLoader(validation_data, batch_size=BATCH_SIZE)
- 
