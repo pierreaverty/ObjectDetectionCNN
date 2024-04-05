@@ -1,44 +1,13 @@
-from data.datasets import CharacterDataset
-
 from torchvision.io import read_image
-from PIL import Image
 
 from models.cnn import ObjectDetectionCNN
+
 from functions.losses import BinaryCrossEntropyMeanSquareLoss
 from functions.trainers import Trainer
-
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-import numpy as np
+from utils.plots import plot_bbox
 
 import torch
 import config
-
-device = (
-    "cuda"
-    if torch.cuda.is_available()
-    else "mps"
-    if torch.backends.mps.is_available()
-    else "cpu"
-)
-
-print(f"Using {device} device")
-
-training_data = CharacterDataset(
-    data_dir="datasets/train",
-    transform=None, 
-    target_transform=None
-)
-
-print("Training data loaded, size: ", len(training_data))
-
-validation_data = CharacterDataset(
-    data_dir="datasets/val",
-    transform=None, 
-    target_transform=None
-)
-
-print("Validation data loaded, size: ", len(validation_data))
 
 if __name__ == "__main__":
     model = ObjectDetectionCNN()
@@ -53,12 +22,26 @@ if __name__ == "__main__":
         criterion=criterion, 
         num_epochs=config.NUM_EPOCHS, 
         batch_size=config.BATCH_SIZE, 
-        train_dataset=training_data, 
-        device=device
+        train_dataset=config.training_data, 
+        device=config.device
     )
     
     model = trainer.train()
     
+    model.eval()
+    
+    test_image_path = '/home/omilab-gpu/ObjectDetectionCNN/datasets/train/images/woman1_front_50.jpg'
+    test_image = read_image(test_image_path).float()
+    test_image = test_image.unsqueeze(0)  
+    
+    with torch.no_grad():
+        class_pred, bbox_pred = model(test_image)
+
+    image_width, image_height = 640, 480 
+    bbox_pred = bbox_pred.squeeze().cpu()  
+    bbox_pred = bbox_pred * torch.tensor([image_width, image_height, image_width, image_height])  
+    
+    plot_bbox(test_image_path, bbox_pred)
 
     
     
