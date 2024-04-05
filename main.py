@@ -1,22 +1,18 @@
 from data.datasets import CharacterDataset
 
-from torch.utils.data import DataLoader
-
-from torchvision import transforms
 from torchvision.io import read_image
 from PIL import Image
-from torch import nn
 
 from models.cnn import ObjectDetectionCNN
+from functions.losses import BinaryCrossEntropyMeanSquareLoss
+from functions.trainers import Trainer
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import numpy as np
 
 import torch
-
-
-BATCH_SIZE = 16
+import config
 
 device = (
     "cuda"
@@ -45,5 +41,24 @@ validation_data = CharacterDataset(
 print("Validation data loaded, size: ", len(validation_data))
 
 if __name__ == "__main__":
-    train_dataloader = DataLoader(training_data, batch_size=BATCH_SIZE)
-    validatation_dataloader = DataLoader(validation_data, batch_size=BATCH_SIZE)
+    model = ObjectDetectionCNN()
+    
+    criterion = BinaryCrossEntropyMeanSquareLoss()
+    
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001) 
+
+    trainer = Trainer(
+        model=model, 
+        optimizer=optimizer, 
+        criterion=criterion, 
+        num_epochs=config.NUM_EPOCHS, 
+        batch_size=config.BATCH_SIZE, 
+        train_dataset=training_data, 
+        device=device
+    )
+    
+    model = trainer.train()
+    
+
+    
+    

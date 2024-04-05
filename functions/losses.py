@@ -1,4 +1,6 @@
-from functions import *
+import torch.nn.functional as F
+import torch.nn as nn
+
 
 class BinaryCrossEntropyMeanSquareLoss(nn.Module):
     """
